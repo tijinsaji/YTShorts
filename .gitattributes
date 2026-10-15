@@ -1,0 +1,4 @@
+# Keep line endings correct for each OS, whoever checks the repository out.
+* text=auto
+*.sh  text eol=lf
+*.bat text eol=crlf

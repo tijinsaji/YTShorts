@@ -1,0 +1,7 @@
+# Python packages needed by ytshorts (the setup scripts install these for you).
+# Python 3.10 or newer is required.
+
+# Provides an ffmpeg program on Windows, macOS and Linux, so you don't have
+# to install ffmpeg yourself. If ffmpeg is already installed on your system,
+# that one is used instead.
+imageio-ffmpeg

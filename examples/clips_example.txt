@@ -1,0 +1,13 @@
+# Example clips file for make-shorts.
+#
+# One clip per line, in the order they should appear in the Short:
+#     start end label
+#
+# Times can be h:mm:ss, m:ss or plain seconds (decimals are fine: 1:05.5).
+# A "-" between the times is allowed. The label is optional and is only
+# shown while the Short is being made.
+# Blank lines and lines starting with # are ignored.
+
+0:12 0:20 Opening line
+1:05 - 1:18 The main point
+2:30.5 2:41 Closing thought

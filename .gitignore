@@ -1,0 +1,22 @@
+# Python environment and build files
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+
+# Videos and audio (keep large media out of the repository)
+*.mp4
+*.webm
+*.mkv
+*.mov
+*.m4a
+*.mp3
+*.part
+*.ytdl
+
+# Output folder from make-shorts --separate
+/clips/
+
+/clips.txt

@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ytshorts"
+version = "1.0.0"
+description = "Cut timestamp ranges out of a long video and join them into a YouTube Short."
+readme = { file = "README.txt", content-type = "text/plain" }
+requires-python = ">=3.10"
+dependencies = [
+    "imageio-ffmpeg",
+]
+
+[project.scripts]
+make-shorts = "ytshorts.make_shorts:main"
+
+[tool.setuptools]
+packages = ["ytshorts"]

@@ -63,7 +63,9 @@ Each line is:   start end label
   * A dash between the times is fine too: 1:09:34 - 1:10:18
   * The label is optional. It's only shown while the Short is being made.
 
-The finished video is saved as short.mp4 in the folder you ran it from.
+Finally it asks where to save the Short. Press Enter to save it next to the
+video as "<video name>_short.mp4", or type (or drag in) a folder or a file name.
+New folders are created for you, and it asks before replacing an existing file.
 
 Using a clips file instead of typing
   Write the clips in a text file (see examples/clips_example.txt) and run:
@@ -76,14 +78,16 @@ Using a clips file instead of typing
 
 Options
   --clips FILE      read the clips from a text file instead of typing them
-  -o, --output FILE name of the finished video (default: short.mp4)
+  -o, --output PATH where to save the Short: a file name, or a folder to save
+                    "<video name>_short.mp4" into. Skips the question.
   --mode original   keep the video's own shape (default)
   --mode crop       fill the vertical 9:16 frame by cutting off the sides
   --mode blur       vertical 9:16 with the whole video in the middle and a
                     blurred copy of it behind
   --padding SECONDS extra time added before and after every clip so words
                     aren't cut off (default: 0.5)
-  --separate        also save each clip as its own file in a "clips" folder
+  --separate        also save each clip as its own file, in a
+                    "<short name>_clips" folder next to the Short
   -h, --help        show all options
 
 Example:

@@ -79,7 +79,7 @@ def ask_for_clips() -> list[tuple[str, str, str]]:
     clips = []
     while True:
         try:
-            line = input(f"Clip {len(clips) + 1}: ").strip("﻿ \t")
+            line = input(f"Clip {len(clips) + 1}: ").strip("\ufeff \t")
         except EOFError:
             break
         if not line:
@@ -92,6 +92,42 @@ def ask_for_clips() -> list[tuple[str, str, str]]:
         except ValueError as e:
             print(f"  {e} - try again.")
     return clips
+
+
+def clean_path_input(text: str) -> str:
+    """Tidy a typed or dragged-in path (dragging often adds quotes around it)."""
+    return text.strip("\ufeff \"'")
+
+
+def output_path(choice: str, src: Path) -> Path:
+    """Turn a file or folder the user chose into the path of the finished Short."""
+    path = Path(choice).expanduser()
+    if path.is_dir() or choice.endswith(("/", "\\")):
+        path = path / f"{src.stem}_short.mp4"
+    elif not path.suffix:
+        path = path.with_suffix(".mp4")
+    return path
+
+
+def ask_for_output(src: Path) -> Path:
+    """Ask where to save the Short; Enter keeps the default next to the video."""
+    default = src.resolve().parent / f"{src.stem}_short.mp4"
+    print("\nWhere should the Short be saved? Type or drag a folder or a file name.")
+    print(f"Press Enter to save it as: {default}")
+    while True:
+        try:
+            choice = clean_path_input(input("Save to: "))
+        except EOFError:
+            return default
+        path = output_path(choice, src) if choice else default
+        if not path.exists():
+            return path
+        try:
+            answer = input(f"  {path} already exists. Replace it? [y/N]: ").strip().lower()
+        except EOFError:
+            answer = ""
+        if answer in ("y", "yes"):
+            return path
 
 
 def video_filter(mode: str) -> list[str]:
@@ -133,14 +169,17 @@ def main() -> None:
     parser = argparse.ArgumentParser(prog="make-shorts", description="Cut timestamps from a video and join them.")
     parser.add_argument("video", nargs="?",
                         help="path to the source video file (if left out, you'll be asked for it)")
-    parser.add_argument("-o", "--output", default="short.mp4", help="output file (default: short.mp4)")
+    parser.add_argument("-o", "--output", metavar="FILE_OR_FOLDER",
+                        help="where to save the Short (if left out, you'll be asked; "
+                             "the suggested default is <video name>_short.mp4 next to the video)")
     parser.add_argument("--padding", type=float, default=0.5,
                         help="seconds added before and after each clip so words aren't cut off (default: 0.5)")
     parser.add_argument("--mode", choices=["original", "crop", "blur"], default="original",
                         help="original = keep shape, crop = fill 9:16 by cropping sides, "
                              "blur = 9:16 with blurred background (default: original)")
     parser.add_argument("--separate", action="store_true",
-                        help="also keep each clip as its own file in a 'clips' folder")
+                        help="also keep each clip as its own file, in a '<short name>_clips' folder "
+                             "next to the Short")
     parser.add_argument("--clips", metavar="FILE",
                         help="text file with one 'start end label' per line "
                              "(if left out, you'll be asked to type the clips in)")
@@ -150,8 +189,7 @@ def main() -> None:
 
     video = args.video
     while not video:
-        # Dragging a file into the terminal often adds quotes around the path.
-        video = input("Path to the video (you can drag the file here): ").strip("﻿ \"'")
+        video = clean_path_input(input("Path to the video (you can drag the file here): "))
     src = Path(video)
     if not src.is_file():
         sys.exit(f"Video file not found: {src}")
@@ -168,9 +206,13 @@ def main() -> None:
         if not clips:
             sys.exit("No clips entered.")
 
-    clips_dir = Path("clips")
+    output = output_path(args.output, src) if args.output else ask_for_output(src)
+    output.parent.mkdir(parents=True, exist_ok=True)
+
+    clips_dir = output.parent / f"{output.stem}_clips"
     if args.separate:
         clips_dir.mkdir(exist_ok=True)
+    print()
 
     total = 0.0
     with tempfile.TemporaryDirectory() as tmp:
@@ -197,10 +239,12 @@ def main() -> None:
         subprocess.run([
             ffmpeg, "-y", "-hide_banner", "-loglevel", "error",
             "-f", "concat", "-safe", "0", "-i", str(list_file),
-            "-c", "copy", "-movflags", "+faststart", args.output,
+            "-c", "copy", "-movflags", "+faststart", str(output),
         ], check=True)
 
-    print(f"\nDone: {args.output}  (about {total:.0f} seconds)")
+    print(f"\nDone: {output}  (about {total:.0f} seconds)")
+    if args.separate:
+        print(f"Separate clips: {clips_dir}")
     if total > 180:
         print("Warning: this is longer than 3 minutes, which is over the YouTube Shorts limit.")
 

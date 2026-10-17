@@ -96,6 +96,44 @@ Example:
 YouTube Shorts can be up to 3 minutes long. YTShorts warns you if yours is longer.
 
 
+ADDING SUBTITLES
+----------------
+
+make-subtitles burns subtitles into a video (for example your finished Short),
+shown on a light grey box. Write the subtitles in a text file, one per entry,
+with times measured from the start of that video:
+
+    0:00 - 0:04  What is the real reason behind all our blessings?
+    0:05 - 0:09  Copying someone will not bring the blessing.
+
+.srt files work too, and so do [00:05 - 00:09] or 00:00:05,000 --> 00:00:09,000
+style times. See examples/subtitles_example.txt.
+
+Windows:        make_subtitles.bat my_short.mp4 my_subtitles.txt
+macOS / Linux:  ./make_subtitles.sh my_short.mp4 my_subtitles.txt
+
+The result is saved next to the video as "<video name>_subtitled.mp4".
+Long subtitles wrap onto several lines and the box grows to fit them.
+
+Options
+  -o, --output FILE     name of the subtitled video
+  --box-mode always     one box stays on screen, sized for the longest
+                        subtitle (default)
+  --box-mode with-text  a box fitted to each subtitle, shown only while
+                        that subtitle is on screen
+  --box-until TIME      the box (and any subtitle still showing) disappears
+                        at this time, e.g. 1:15; later subtitles are left out
+  --box-y 0.72          height of the box on screen (0 = top, 1 = bottom)
+  --box-color D3D3D3    box colour (hex), --box-opacity 0.85 (0 to 1)
+  --text-color 202020   text colour (hex)
+  --font Arial          font, --font-size 80 (pixels), --bold
+  --lines 2             make the box at least this many lines tall
+  -h, --help            show all options
+
+Example:
+  make_subtitles.bat sermon_short.mp4 subtitles.txt --box-mode with-text --box-until 1:15
+
+
 USING IT FROM A TERMINAL
 ------------------------
 
@@ -106,6 +144,7 @@ command directly from any folder:
   macOS / Linux:  source .venv/bin/activate
 
   make-shorts my_video.mp4 --clips my_clips.txt --mode crop
+  make-subtitles my_short.mp4 my_subtitles.txt
 
 Or install it into any Python environment with:   pip install .
 
@@ -129,6 +168,10 @@ macOS says the script can't be opened
 A clip starts or ends mid-word
     Increase --padding, for example --padding 1
 
+"No subtitles were found" (make-subtitles)
+    Each subtitle needs a start time, an end time and some text, e.g.
+    0:00 - 0:04  Your subtitle text   (see examples/subtitles_example.txt)
+
 
 PROJECT LAYOUT
 --------------
@@ -138,5 +181,6 @@ PROJECT LAYOUT
   pyproject.toml            package definition (used by pip / setup scripts)
   setup.bat / setup.sh      one-time setup for Windows / macOS + Linux
   make_shorts.bat / .sh     run make-shorts
-  examples/                 example clips file
+  make_subtitles.bat / .sh  run make-subtitles
+  examples/                 example clips and subtitles files
   ytshorts/                 the Python code

@@ -33,6 +33,6 @@ echo "Installing ytshorts and its requirements ..."
 .venv/bin/python -m pip install --upgrade pip
 .venv/bin/python -m pip install -e .
 
-chmod +x make_shorts.sh
+chmod +x make_shorts.sh make_subtitles.sh
 echo
 echo "Setup complete. Run ./make_shorts.sh to get started."
